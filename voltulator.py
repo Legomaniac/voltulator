@@ -4,39 +4,8 @@ import locale
 import datetime
 import urllib2
 import pprint
-from bs4 import BeautifulSoup
 
-locale.setlocale(locale.LC_ALL, 'english_united-states')
-
-class PriceGrabber(object):
-
-    def __init__(self, url):
-        self.url = url
-
-    def grab(self):
-        subtract = 0
-        add = 0
-        data = []
-        page = urllib2.urlopen(self.url).read()
-        soup = BeautifulSoup(page, "html.parser")
-
-        table = soup.find('table', {"class" : "table"})
-        x = (len(table.findAll('tr')) - 1)
-
-        for row in table.findAll('tr')[1:x]:
-           cols = row.findAll('td')
-           if len(cols) > 3:
-              if cols[3].input is not None:
-                  data.append(cols[3].input['value'])
-
-        for value in data[:-1]:
-            if value.startswith("("):
-                subtract += float(value[2:-1])
-            else:
-                add += float(value[1:-1])
-
-        centsPerkWh = add - subtract
-        return centsPerkWh
+locale.setlocale(locale.LC_ALL, 'en_US')
 
 class Voltulator(object):
 
@@ -84,14 +53,11 @@ class Voltulator(object):
         return fixed
 
 if __name__ == '__main__':
-    fileString = "C:\Users\WOOD\Downloads\chargingHistory.csv"
+    fileString = "/home/volt/chargingHistory.csv"
     now = datetime.datetime.now()
     monthNum = now.strftime("%m")
 
-    priceGrab = PriceGrabber('http://rates.northwesternenergy.com/residentialelectricrates.aspx')
-    price = priceGrab.grab()
-
-    calc = Voltulator(fileString, price, monthNum)
+    calc = Voltulator(fileString, .107423, monthNum)
     out = calc.modifyCSV()
 
     pp = pprint.PrettyPrinter(indent=4)
