@@ -18,6 +18,17 @@
     display: block;
 }
 input[readonly] {
-   background-color: white !important;
-   cursor: text !important;
+    background-color: white !important;
+    cursor: text !important;
+}
+
+.box {
+    padding-top: 5px;
+    padding-bottom: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+}
+
+.skinny {
+    width: 250px;
 }
