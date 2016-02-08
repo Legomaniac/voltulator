@@ -1,0 +1,14 @@
+.box {
+    padding-top: 5px;
+    padding-bottom: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+}
+
+.skinny {
+    width: 275px;
+}
+
+.price {
+    text-indent: 10%;
+}

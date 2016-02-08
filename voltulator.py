@@ -9,9 +9,10 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 
 class Voltulator(object):
 
-    def __init__(self, filePath, rate, month=None):
+    def __init__(self, filePath, elecRate, gasRate, month=None):
         self.inputFile = filePath
-        self.centsPerkWh = rate
+        self.centsPerkWh = elecRate
+        self.dollarsPerGallon = gasRate
         self.month = month
 
     def modifyCSV(self):
@@ -39,11 +40,23 @@ class Voltulator(object):
                     cols.append(costFormatted)
             if cols:
                 outList.append(cols)
+
+        # The Volt gets 98 MPGe electric only, but only 37 MPG gas only.
+        # Therefore it is 2.65 times more effecient when running off of the battery.
+        adjustedkWhr = totalkWhr * 2.65
+        # EPA says 1 gallon of gasoline = 33.7 kWhr.
+        equivGallons = adjustedkWhr / 33.7
+        # Gallons that would have been burned if never charged, times the currect cost of Premium gas
+        gasCost = equivGallons * self.dollarsPerGallon
+        gasCostFormatted = locale.currency(gasCost)
         totalCost = float(totalkWhr) * self.centsPerkWh
+        # Cost of electricty divided by the hypothetical gas only cost 
+        percentageOfGasCost = (totalCost / gasCost) * 100
         totalCostFormatted = locale.currency(totalCost)
         outList.append(["", "Total kWhr: %s" % totalkWhr, "Total Cost: %s" % totalCostFormatted])
 
-        return outList
+        outDict = {'list':outList, 'outCost':totalCostFormatted, 'outGas':gasCostFormatted, 'outPercent':"%.2f%%" % percentageOfGasCost}
+        return outDict
 
     def stripNullBytes(self, fileToStrip):
         fixed = []

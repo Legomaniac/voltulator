@@ -2,6 +2,7 @@
 <html lang="en">
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="static/css/base.css">
 
 <nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -33,6 +34,15 @@
         </tr>
     {% endfor %}
     </table>
+</div>
+<div class="col-md-4">
+You spent:
+<h3 class="price">{{ totalCost }}</h3>
+<br>
+Gas only, you would have spent:
+<h3 class="price">{{ gasCost }}</h3>
+<br>
+You spent {{ percent }} the cost of gas!
 </div>
 
 </div>
