@@ -1,11 +1,12 @@
 #! python
 import os
+import uuid
 import datetime
 from voltulator import Voltulator
 from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/tmp/'
+UPLOAD_FOLDER = '/data/voltulator/charging_csvs/'
 ALLOWED_EXTENSIONS = set(['csv'])
 
 app = Flask(__name__)
@@ -16,9 +17,9 @@ def allowed_file(filename):
 
 @app.route("/example")
 def returnExample():
-    elecPrice = .107423
-    gasPrice = 1.99
-    calc = Voltulator(os.path.join("/tmp/", "exampleChargingHistory.csv"), elecPrice, gasPrice, None)
+    elecPrice = .10
+    gasPrice = 2.65
+    calc = Voltulator(os.path.join("/data/voltulator/", "exampleChargingHistory.csv"), elecPrice, gasPrice, None)
     output = calc.modifyCSV()
     return render_template('table.html', table=output['list'], totalCost=output['outCost'], \
                            gasCost=str(output['outGas']), percent=str(output['outPercent']))
@@ -31,7 +32,8 @@ def upload_file():
         dollarsPrGal = request.form['ingas']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            uniqname = uuid.uuid4().hex + "." + filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], uniqname))
 
             now = datetime.datetime.now()
             monthNum = now.strftime("%m")
@@ -39,7 +41,7 @@ def upload_file():
             elecPrice = float(centsPrkWhr)/100
             gasPrice = float(dollarsPrGal)
 
-            calc = Voltulator(os.path.join(app.config['UPLOAD_FOLDER'], filename), elecPrice, gasPrice, None)
+            calc = Voltulator(os.path.join(app.config['UPLOAD_FOLDER'], uniqname), elecPrice, gasPrice, None)
             output = calc.modifyCSV()
 
             return render_template('table.html', table=output['list'], totalCost=output['outCost'], \
